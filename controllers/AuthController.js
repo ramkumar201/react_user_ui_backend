@@ -1,9 +1,39 @@
 import UserModel from "../models/User.model.js";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+dotenv.config();
 
 export async function UserLogin(req, res) {
     try {
-        res.json("User Login");
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).send({ message: "Email or Password not found" });
+        }
+
+        let udata = await UserModel.findOne({ email }).exec();
+        if (!udata) {
+            return res.status(400).send({ message: "Email not found" });
+        }
+
+        const chkPass = await bcrypt.compare(password, udata.password);
+        if (!chkPass) {
+            return res.status(400).send({ message: "Password does not match" });
+        }
+
+        const token = jwt.sign({
+            user_id: udata._id,
+            email: udata.email,
+            firstName: udata.firstName,
+            lastName: udata.lastName
+        }, process.env.JWT_KEY, { expiresIn: "2h" });
+
+        return res.status(200).send({
+            token: token,
+            message: "Login successfully"
+        })
+
     } catch (error) {
         res.status(500).send(error);
     }
