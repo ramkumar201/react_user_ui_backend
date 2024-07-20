@@ -1,8 +1,7 @@
 import UserModel from "../models/User.model.js";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
-dotenv.config();
+import * as AuthService from "../services/AuthService.js";
+
 
 export async function UserLogin(req, res) {
     try {
@@ -22,12 +21,7 @@ export async function UserLogin(req, res) {
             return res.status(400).send({ message: "Password does not match" });
         }
 
-        const token = jwt.sign({
-            user_id: udata._id,
-            email: udata.email,
-            firstName: udata.firstName,
-            lastName: udata.lastName
-        }, process.env.JWT_KEY, { expiresIn: "2h" });
+        const token = await AuthService.GenerateToken(udata);
 
         return res.status(200).send({
             token: token,
