@@ -22,9 +22,14 @@ export async function UserLogin(req, res) {
         }
 
         const token = await AuthService.GenerateToken(udata);
+        const refreshToken = await AuthService.GenerateRefreshToken(udata);
+
+        res.cookie('_token', token)
+        res.cookie('_refreshtoken', refreshToken, { httpOnly: true, secure: true, sameSite: 'strict' })
 
         return res.status(200).send({
-            token: token,
+            _token: token,
+            _refreshToken: refreshToken,
             message: "Login successfully"
         })
 

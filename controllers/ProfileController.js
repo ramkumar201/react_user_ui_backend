@@ -3,9 +3,19 @@ import UserModel from "../models/User.model.js";
 
 export async function GetProfile(req, res) {
     try {
-        res.json("Get User Profile");
+        let user = req.user;
+        if (user) {
+            let id = decode.user_id;
+            let userData = await UserModel.findById(id).select([
+                '_id', 'firstName', 'lastName', 'email', 'profile', 'updatedAt'
+            ]);
+            return res.status(200).send(userData);
+        } else {
+            return res.status(201).send({ message: "Token user not found" });
+        }
     } catch (error) {
-        res.status(500).send(error);
+        console.log(' -- Get Profile Error -- ')
+        return res.status(404).send(error);
     }
 }
 
