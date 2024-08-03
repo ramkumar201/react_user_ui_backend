@@ -8,17 +8,26 @@ export async function UserLogin(req, res) {
         const { email, password } = req.body;
 
         if (!email || !password) {
-            return res.status(400).send({ message: "Email or Password not found" });
+            return res.status(400).send({
+                status: false,
+                message: "Email or Password not found"
+            });
         }
 
         let udata = await UserModel.findOne({ email }).exec();
         if (!udata) {
-            return res.status(400).send({ message: "Email not found" });
+            return res.status(400).send({
+                status: false,
+                message: "Email not found"
+            });
         }
 
         const chkPass = await bcrypt.compare(password, udata.password);
         if (!chkPass) {
-            return res.status(400).send({ message: "Password does not match" });
+            return res.status(400).send({
+                status: false,
+                message: "Password does not match"
+            });
         }
 
         const token = await AuthService.GenerateToken(udata);
@@ -30,7 +39,9 @@ export async function UserLogin(req, res) {
         return res.status(200).send({
             _token: token,
             _refreshToken: refreshToken,
-            message: "Login successfully"
+            status: true,
+            message: "Login successfully",
+            data: udata,
         })
 
     } catch (error) {

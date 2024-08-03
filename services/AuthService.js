@@ -31,7 +31,7 @@ export async function GenerateRefreshToken(data) {
         return refreshToken;
 
     } catch (err) {
-        console.log('Generate Token Error -- ');
+        console.log('Generate Refresh Token Error -- ');
         return '';
     }
 }
