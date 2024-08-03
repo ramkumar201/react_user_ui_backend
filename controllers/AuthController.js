@@ -53,14 +53,27 @@ export async function UserRegister(req, res) {
     try {
         const { firstName, lastName, email, password } = req.body;
 
+        if (!firstName || !lastName || !email || !password) {
+            return res.status(400).send({
+                status: false,
+                message: "The user details are not found."
+            });
+        }
+
         // Check if email already exists
         let udata = await UserModel.findOne({ email }).exec();
         if (udata) {
-            return res.status(409).send({ message: "Email already exists" });
+            return res.status(409).send({
+                status: false,
+                message: "Email already exists"
+            });
         }
 
         if (!password) {
-            return res.status(400).send({ message: "Password is required" });
+            return res.status(400).send({
+                status: false,
+                message: "Password is required"
+            });
         }
 
         // Hash the password and save the new user
@@ -73,11 +86,17 @@ export async function UserRegister(req, res) {
         });
 
         await user.save();
-        return res.status(201).send({ message: "User saved successfully" });
+        return res.status(201).send({
+            status: true,
+            message: "User saved successfully"
+        });
 
     } catch (error) {
         console.log(error);
-        return res.status(500).send({ error: "Internal Server Error" });
+        return res.status(500).send({
+            status: false,
+            error: "Internal Server Error"
+        });
     }
 }
 
