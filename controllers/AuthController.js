@@ -121,7 +121,26 @@ export async function VerifyOTP(req, res) {
 
 export async function ResetPassword(req, res) {
     try {
-        res.json("Verify OTP");
+        const { id, token } = req.param;
+        const { password } = req.body;
+        if (!password) {
+            return res.status(400).send({
+                status: false,
+                error: "Password not found"
+            })
+        }
+
+        let udata = await UserModel.findOne({ _id: id }).exec();
+        if (!udata) {
+            return res.status(400).send({
+                status: false,
+                error: "Email not existed"
+            })
+        }
+
+        const updatePassword = await bcrypt.hash(password, 10);
+
+        return res.json("Verify OTP");
     } catch (error) {
         res.status(500).send(error);
     }

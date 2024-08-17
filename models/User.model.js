@@ -14,7 +14,7 @@ export const UserSchema = new mongoose.Schema({
         required: [true, "Please provide a password"],
         unique: false
     },
-    mobile: { type: Number },
+    phone: { type: Number },
     address: { type: String },
     photo: { type: String }
 }, { timestamps: true });

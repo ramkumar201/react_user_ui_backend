@@ -11,11 +11,12 @@ router.route('/user/:id').get(AuthMiddleware, ProfileController.GetProfile)
 router.route('/generateOTP').get(AuthController.GenerateOTP)
 router.route('/verifyOTP').get(AuthController.VerifyOTP)
 router.route('/createResetSession').get(AuthController.CreateResetSession)
+router.route('/getprofileinfo/:id').get(AuthMiddleware, ProfileController.GetProfile)
 
 /** POST */
 router.route('/login').post(AuthController.UserLogin)
-
 router.route('/register').post(AuthController.UserRegister)
+router.route('/updateprofile').post(AuthMiddleware, ProfileController.UpdateProfile)
 
 /** PUT */
 router.route('/updateUser').put(AuthMiddleware, ProfileController.GetProfile)

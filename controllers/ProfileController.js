@@ -3,18 +3,18 @@ import UserModel from "../models/User.model.js";
 
 export async function GetProfile(req, res) {
     try {
-        let user = req.user;
-        if (user) {
-            let id = decode.user_id;
+
+        let id = req.params.id;
+        if (id) {
             let userData = await UserModel.findById(id).select([
-                '_id', 'firstName', 'lastName', 'email', 'profile', 'updatedAt'
+                '_id', 'firstName', 'lastName', 'email', 'profile', 'phone', 'updatedAt'
             ]);
             return res.status(200).send(userData);
         } else {
             return res.status(201).send({ message: "Token user not found" });
         }
     } catch (error) {
-        console.log(' -- Get Profile Error -- ')
+        console.log(' -- Get Profile Error -- ', error)
         return res.status(404).send(error);
     }
 }
@@ -22,7 +22,33 @@ export async function GetProfile(req, res) {
 
 export async function UpdateProfile(req, res) {
     try {
-        res.json("Update User Profile");
+
+        let data = req.body;
+        let authId = req.user._id;
+        authId = authId.toString();
+
+        if (data._id !== authId) {
+            return res.status(401).send({
+                message: "Update user not matched login user"
+            })
+        }
+
+        await UserModel.findOneAndUpdate({ _id: authId }, {
+            firstName: data.firstName,
+            lastName: data.lastName,
+            email: data.email,
+            phone: data.phone,
+        }).then(returnData => {
+            res.status(200).send({
+                message: "Update user profile",
+                data: returnData
+            })
+        }).catch(err => {
+            res.status(200).send({
+                message: "Something went wrong",
+                err: err
+            })
+        })
     } catch (error) {
         res.status(500).send(error);
     }
