@@ -20,10 +20,6 @@ app.use(cookieParser());
 const PORT = process.env.PORT || 3000;
 
 
-app.get('/', (req, res) => {
-    res.json({ "start": true });
-})
-
 
 /** API Route */
 app.use('/v1/api', router)

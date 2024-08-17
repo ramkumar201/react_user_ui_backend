@@ -1,5 +1,6 @@
 
 import UserModel from "../models/User.model.js";
+import * as FileUploadService from "../services/FileUploadService.js";
 
 export async function GetProfile(req, res) {
     try {
@@ -7,7 +8,7 @@ export async function GetProfile(req, res) {
         let id = req.params.id;
         if (id) {
             let userData = await UserModel.findById(id).select([
-                '_id', 'firstName', 'lastName', 'email', 'profile', 'phone', 'updatedAt'
+                '_id', 'firstName', 'lastName', 'email', 'profile', 'phone', 'image', 'updatedAt'
             ]);
             return res.status(200).send(userData);
         } else {
@@ -22,7 +23,6 @@ export async function GetProfile(req, res) {
 
 export async function UpdateProfile(req, res) {
     try {
-
         let data = req.body;
         let authId = req.user._id;
         authId = authId.toString();
@@ -33,12 +33,18 @@ export async function UpdateProfile(req, res) {
             })
         }
 
-        await UserModel.findOneAndUpdate({ _id: authId }, {
+        let updateValue = {
             firstName: data.firstName,
             lastName: data.lastName,
             email: data.email,
-            phone: data.phone,
-        }).then(returnData => {
+            phone: data.phone
+        }
+        if (req.file) {
+            let profileImg = await FileUploadService.uploadFile(req.file, 'profile');
+            updateValue = { ...updateValue, image: profileImg }
+        }
+
+        await UserModel.findOneAndUpdate({ _id: authId }, updateValue).then(returnData => {
             res.status(200).send({
                 message: "Update user profile",
                 data: returnData
@@ -50,6 +56,7 @@ export async function UpdateProfile(req, res) {
             })
         })
     } catch (error) {
+        console.log(error)
         res.status(500).send(error);
     }
 }

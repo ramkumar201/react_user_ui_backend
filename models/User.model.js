@@ -16,7 +16,7 @@ export const UserSchema = new mongoose.Schema({
     },
     phone: { type: Number },
     address: { type: String },
-    photo: { type: String }
+    image: { type: String }
 }, { timestamps: true });
 
 export default mongoose.model.Users || mongoose.model('user', UserSchema);

@@ -1,5 +1,6 @@
 import { Router } from "express";
 const router = Router();
+import upload from "../Config/MulterConfig.js";
 
 import * as AuthController from "../controllers/AuthController.js"
 import * as ProfileController from "../controllers/ProfileController.js"
@@ -16,7 +17,7 @@ router.route('/getprofileinfo/:id').get(AuthMiddleware, ProfileController.GetPro
 /** POST */
 router.route('/login').post(AuthController.UserLogin)
 router.route('/register').post(AuthController.UserRegister)
-router.route('/updateprofile').post(AuthMiddleware, ProfileController.UpdateProfile)
+router.route('/updateprofile').post(AuthMiddleware, upload.single('profileImage'), ProfileController.UpdateProfile)
 
 /** PUT */
 router.route('/updateUser').put(AuthMiddleware, ProfileController.GetProfile)

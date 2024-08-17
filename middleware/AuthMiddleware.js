@@ -7,7 +7,7 @@ const AuthMiddleware = async (req, res, next) => {
         /** Get Token */
         let details = {};
         if (req.headers && req.headers.authorization) {
-            token = req.headers.authorization.split(" ");
+            let token = req.headers.authorization.split(" ");
             if (token.length === 2) {
                 details = jwt.verify(token[1], process.env.JWT_TOKEN_KEY, (err, decode) => {
                     if (err) {
