@@ -16,7 +16,7 @@ const AuthMiddleware = async (req, res, next) => {
                     return decode;
                 })
             } else {
-                return res.json(401, { err: 'Format is Authorization: Bearer [token]' });
+                return res.status(401).json({ err: 'Format is Authorization: Bearer [token]' })
             }
         } else if (req.cookies._token) {
             details = jwt.verify(req.cookies._token, process.env.JWT_TOKEN_KEY, (err, decode) => {
@@ -28,13 +28,13 @@ const AuthMiddleware = async (req, res, next) => {
         } else if (req.cookies._refreshtoken) {
             details = refreshToken(req, res)
         } else {
-            return res.json(401, { err: 'No Authorization header was found' });
+            return res.status(401).json({ err: 'No Authorization header was found' })
         }
 
         if (Object.keys(details).length > 0) {
             let uid = details.user_id;
             const userData = await UserModel.findById(uid).exec();
-            console.log(userData)
+            // console.log(userData)
             req.user = userData;
         }
         next();

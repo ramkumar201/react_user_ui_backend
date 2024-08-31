@@ -1,7 +1,7 @@
+import jwt from "jsonwebtoken";
 import UserModel from "../models/User.model.js";
 import bcrypt from "bcrypt";
 import * as AuthService from "../services/AuthService.js";
-
 
 export async function UserLogin(req, res) {
     try {
@@ -155,4 +155,61 @@ export async function CreateResetSession(req, res) {
         res.status(500).send(error);
     }
 
+}
+
+
+export async function AuthStatus(req, res) {
+    if (req.cookies._refreshtoken) {
+        let udata = jwt.verify(req.cookies._refreshtoken, process.env.JWT_REFRESH_TOKEN_KEY);
+
+        const token = await AuthService.GenerateToken({ ...udata, _id: udata.user_id });
+        const refreshToken = await AuthService.GenerateRefreshToken({ ...udata, _id: udata.user_id });
+
+        res.cookie('_token', token)
+        res.cookie('_refreshtoken', refreshToken, { httpOnly: true, secure: true, sameSite: 'strict' })
+
+        res.status(200).send({
+            message: "Session refresh using refresh token",
+            authenticated: true,
+        })
+    } else {
+        res.status(401).send({
+            message: "You session got expired.",
+            authenticated: false,
+        })
+    }
+}
+
+export async function AuthGoogleLogin(req, res) {
+    const userdata = req.body;
+    console.log(' ---- userdata --- ', userdata);
+    let udata = await UserModel.findOne({ email: userdata.email }).exec();
+    let token = '';
+    let refreshToken = '';
+    if (!udata) {
+        const password = await bcrypt.hash(Math.random().toString(36).slice(-8), 10);
+        const user = new UserModel({
+            firstName: userdata.name,
+            email: userdata.email,
+            password: password,
+            image: userdata.picture
+        });
+        await user.save();
+        udata = await UserModel.findOne({ email: userdata.email }).exec();
+        token = await AuthService.GenerateToken(udata);
+        refreshToken = await AuthService.GenerateRefreshToken(udata);
+    } else {
+        token = await AuthService.GenerateToken(udata);
+        refreshToken = await AuthService.GenerateRefreshToken(udata);
+    }
+    res.cookie('_token', token)
+    res.cookie('_refreshtoken', refreshToken, { httpOnly: true, secure: true, sameSite: 'strict' })
+
+    return res.status(200).send({
+        _token: token,
+        _refreshToken: refreshToken,
+        status: true,
+        message: "Login successfully",
+        data: udata,
+    })
 }
