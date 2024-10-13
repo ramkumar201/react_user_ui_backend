@@ -1,8 +1,10 @@
 import mongoose from "mongoose";
+import UserModel from "./User.model.js";
 
 export const UserfileSchema = new mongoose.Schema({
     user_id: {
-        type: Number
+        type: mongoose.Schema.Types.ObjectId,
+        ref: UserModel
     },
     file_name: {
         type: String
@@ -11,6 +13,9 @@ export const UserfileSchema = new mongoose.Schema({
         type: String
     },
     file_size: {
+        type: String
+    },
+    file: {
         type: String
     },
 }, { timestamps: true })

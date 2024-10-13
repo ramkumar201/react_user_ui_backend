@@ -5,11 +5,15 @@ import upload from "../Config/MulterConfig.js";
 import * as AuthController from "../controllers/AuthController.js"
 import * as ProfileController from "../controllers/ProfileController.js"
 import * as ChartController from "../controllers/ChartController.js"
+import * as StorageController from "../controllers/StorageController.js"
 import AuthMiddleware from "../middleware/AuthMiddleware.js";
 
 /** GET */
 router.route('/user/:id').get(AuthMiddleware, ProfileController.GetProfile)
 router.route('/auth-status').get(AuthController.AuthStatus)
+
+
+router.route('/getfile').get(AuthMiddleware, StorageController.GetFile)
 // auth - status
 
 router.route('/generateOTP').get(AuthController.GenerateOTP)
